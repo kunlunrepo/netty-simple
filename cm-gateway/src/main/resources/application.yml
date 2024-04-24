@@ -1,0 +1,21 @@
+# 端口
+server:
+  port: 8088
+
+spring:
+  application:
+    name: cm-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.10.55:8848
+        username: nacos
+        password: nacos
+        namespace: cm-dev
+
+#----------gateway配置--------------
+    gateway:
+      enabled: true
+      discovery:
+        locator:
+          lower-case-service-id: true

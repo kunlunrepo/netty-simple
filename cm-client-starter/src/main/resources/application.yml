@@ -1,0 +1,35 @@
+#端口
+server:
+  port: 8083
+
+spring:
+  application:
+    name: cm-client
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.10.55:8848
+        username: nacos
+        password: nacos
+        namespace: cm-dev
+
+#----------redis配置--------------
+  redis:
+    database: 0
+    host: 192.168.10.55
+    port: 6379
+    password: base@GO5r1Ydsb6H
+    timeout: 6000ms  # 连接超时时长（毫秒）
+    jedis:
+      pool:
+        max-active: 1000
+        max-wait: -1ms
+        max-idle: 10
+        min-idle: 5
+
+#----------cm配置--------------
+cm:
+  server:
+    host: 127.0.0.1
+    port: 8088
+    url: ws://127.0.0.1:8088/ws
