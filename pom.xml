@@ -16,6 +16,7 @@
         <module>cm-api</module>
         <module>cm-gateway</module>
         <module>cm-client-starter</module>
+        <module>cm-common</module>
     </modules>
 
     <properties>

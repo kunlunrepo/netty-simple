@@ -1,9 +1,11 @@
 package com.cm.server.netty.handler.server;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * description : WebSocket服务端消息处理器
@@ -14,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
  * date :  2024-04-23 14:36
  */
 @Slf4j
+@Component
+@ChannelHandler.Sharable
 public class WsServerMessageHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
     /**

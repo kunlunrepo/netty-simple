@@ -1,6 +1,8 @@
 package com.cm.gateway.filter;
 
+import com.cm.common.constant.RedisKey;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.route.Route;
@@ -9,6 +11,7 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -51,6 +54,13 @@ public class WsRouteGlobalFilter implements GlobalFilter, Ordered {
     private static final String CM_DEFAULT_PATH = "ws://cm-server";
 
     /**
+     * redis
+     * 说明：获取服务器的信息
+     */
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    /**
      * 自定义配置和管理路由规则
      */
     @Bean
@@ -76,17 +86,11 @@ public class WsRouteGlobalFilter implements GlobalFilter, Ordered {
         Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
         // 判断是否是websocket请求
         if (path.startsWith(CM_PREFIX)) {
-            // TODO 根据规则获取服务端地址
-
+            // 从redis获取已上报的服务端地址 (轮询策略)
+            Set<String> ips = redisTemplate.opsForZSet().range(RedisKey.SERVER_ADDRESS_KEY, 0, 1);
+            String ip = ips.iterator().next();
             // 转发路径
-            String[] IPS = {
-                    "127.0.0.1:9010",
-                    "127.0.0.1:9011",
-                    "127.0.0.1:9012"
-            };
-            Random random = new Random();
-            int index = random.nextInt(IPS.length);
-            String forwardPath = WS_PROT + IPS[index] + path;
+            String forwardPath = WS_PROT + ip + path;
             // 处理请求参数
             handleParams(forwardPath, request);
             URI forwardUri = URI.create(forwardPath);

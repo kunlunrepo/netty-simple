@@ -19,3 +19,17 @@ spring:
       discovery:
         locator:
           lower-case-service-id: true
+
+#----------redis配置--------------
+  redis:
+    database: 0
+    host: 192.168.10.55
+    port: 6379
+    password: base@GO5r1Ydsb6H
+    timeout: 6000ms  # 连接超时时长（毫秒）
+    jedis:
+      pool:
+        max-active: 1000
+        max-wait: -1ms
+        max-idle: 10
+        min-idle: 5
