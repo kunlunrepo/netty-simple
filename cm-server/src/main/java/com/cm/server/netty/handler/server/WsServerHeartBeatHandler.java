@@ -19,6 +19,9 @@ import org.springframework.stereotype.Component;
 @ChannelHandler.Sharable
 public class WsServerHeartBeatHandler extends ChannelDuplexHandler {
 
+    /**
+     * 自定义用户事件 (IdleStateHandler内部会发出该事件)
+     */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         // 判断事件类型

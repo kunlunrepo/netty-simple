@@ -1,6 +1,7 @@
 package com.cm.server.netty.handler.server;
 
 import com.cm.server.service.NettyCacheService;
+import com.cm.server.utils.ChannelIpUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -31,10 +32,8 @@ public class WsServerCloseHandler extends ChannelInboundHandlerAdapter {
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         log.info("[WsServer][通道关闭处理器][handlerRemoved]------ channel={}", ctx.channel());
         // 删除服务器连接数
-        InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().localAddress();
-        String hostAddress = socketAddress.getAddress().getHostAddress();
-        String serverIp = hostAddress + ":"+ socketAddress.getPort();
-        nettyCacheService.removeServerConnectCount(serverIp);
+        String localAddress = ChannelIpUtil.localAddress(ctx.channel());
+        nettyCacheService.removeServerConnectCount(localAddress);
         // 关闭通道
         ctx.close();
     }

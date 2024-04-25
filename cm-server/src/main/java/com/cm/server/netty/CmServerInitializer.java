@@ -2,6 +2,7 @@ package com.cm.server.netty;
 
 import com.cm.server.netty.handler.server.WsServerChannelInit;
 import com.cm.server.service.NettyCacheService;
+import com.cm.server.utils.ChannelIpUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -72,7 +73,7 @@ public class CmServerInitializer implements CommandLineRunner {
         // 连接线程  (接收新客户端连接请求)
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         // 工作线程 (处理已接受的客户端连接及其后续的 I/O 事件和业务逻辑)
-        EventLoopGroup workerGroup = new NioEventLoopGroup(1);
+        EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             // 处理SSL上下文
             // 程序启动组件
@@ -83,27 +84,35 @@ public class CmServerInitializer implements CommandLineRunner {
                     .handler(new LoggingHandler(LogLevel.INFO)) // 内置日志处理器
                     .childHandler(wsServerChannelInit);
             ChannelFuture future = bootstrap.bind().sync(); // 绑定到服务器
-            String serverIp = InetAddress.getLocalHost().getHostAddress() +":"+ CM_SERVER_PORT;
             // 服务器启动后的操作
-            startAfter(serverIp);
-            log.info("******************** [通信模块服务端] "+serverIp+" 启动成功 ********************");
             serverChannel = future.channel();
-            serverChannel.closeFuture().sync(); // 阻塞直到服务器的channel关闭
-
+            String localJavaAddress = ChannelIpUtil.localJavaAddress(serverChannel);
+            startAfter(localJavaAddress);
+            log.info("******************** [通信模块服务端] "+localJavaAddress+" 启动成功 ********************");
+            // 服务端关闭监听器
+            serverChannel.closeFuture().addListener((ChannelFuture channelFuture) -> {
+                // 获取通道
+                Channel closeChannel = channelFuture.channel();
+                String closeLocalAddress = ChannelIpUtil.localAddress(closeChannel);
+                log.error("[通信模块服务端] 关闭服务器：{}", closeLocalAddress);
+                // 添加到缓存
+                nettyCacheService.removeServerAddress(closeLocalAddress);
+            }); // 阻塞直到服务器的channel关闭
 
         } catch (Exception e) {
             e.printStackTrace();
             log.error("[通信模块服务端]启动异常", e);
-        } finally {
             try {
                 // 关闭
                 bossGroup.shutdownGracefully().sync();
                 workerGroup.shutdownGracefully().sync(); // 关闭
                 log.info("******************** [通信模块服务端]关闭 ********************");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                log.error("[通信模块服务端]关闭异常", e);
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+                log.error("[通信模块服务端]关闭异常", ex);
             }
+        } finally {
+
         }
     }
 

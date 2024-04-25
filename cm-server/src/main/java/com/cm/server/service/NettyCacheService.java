@@ -14,6 +14,11 @@ public interface NettyCacheService {
     void addServerAddress(String serverAddress);
 
     /**
+     * 删除服务地址
+     */
+    void removeServerAddress(String serverAddress);
+
+    /**
      * 新增服务器连接数
      */
     void addServerConnectCount(String serverAddress);

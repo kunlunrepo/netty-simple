@@ -30,6 +30,15 @@ public class NettyCacheServiceImpl implements NettyCacheService {
     }
 
     /**
+     * 删除服务地址
+     */
+    @Override
+    public void removeServerAddress(String serverAddress) {
+        // 向redis删除服务端地址
+        redisTemplate.opsForZSet().remove(RedisKey.SERVER_ADDRESS_KEY, serverAddress);
+    }
+
+    /**
      * 新增服务器连接数
      */
     @Override

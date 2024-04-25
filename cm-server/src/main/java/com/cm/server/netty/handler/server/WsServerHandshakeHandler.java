@@ -1,6 +1,7 @@
 package com.cm.server.netty.handler.server;
 
 import com.cm.server.service.NettyCacheService;
+import com.cm.server.utils.ChannelIpUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -50,10 +51,8 @@ public class WsServerHandshakeHandler extends ChannelInboundHandlerAdapter {
      */
     private void handshakeSuccessAfter(Channel channel) {
         // 获取服务器IP
-        InetSocketAddress socketAddress = (InetSocketAddress) channel.localAddress();
-        String hostAddress = socketAddress.getAddress().getHostAddress();
-        String serverIp = hostAddress + ":"+ socketAddress.getPort();
+        String localAddress = ChannelIpUtil.localAddress(channel);
         // 上报连接数
-        nettyCacheService.addServerConnectCount(serverIp);
+        nettyCacheService.addServerConnectCount(localAddress);
     }
 }

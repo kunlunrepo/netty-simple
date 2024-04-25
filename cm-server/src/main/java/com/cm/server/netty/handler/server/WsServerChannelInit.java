@@ -61,7 +61,7 @@ public class WsServerChannelInit extends ChannelInitializer<SocketChannel> {
 //        }
         // 添加心跳检测处理器 (用于检测和管理网络连接空闲状态的关键组件。开发者可以实现心跳检测、资源清理、超时处理等功能)
         pipeline.addLast(new IdleStateHandler(20, 0, 60));
-        // 添加心跳处理器
+        // 添加自定义心跳处理器
         pipeline.addLast(wsServerHeartBeatHandler);
         // 添加自定义关闭处理器
         pipeline.addLast(wsServerCloseHandler);
