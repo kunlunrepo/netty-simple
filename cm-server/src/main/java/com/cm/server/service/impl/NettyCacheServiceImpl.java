@@ -38,5 +38,14 @@ public class NettyCacheServiceImpl implements NettyCacheService {
         redisTemplate.opsForZSet().incrementScore(RedisKey.SERVER_ADDRESS_KEY, serverAddress, 1d);
     }
 
+    /**
+     * 删除服务器连接数
+     */
+    @Override
+    public void removeServerConnectCount(String serverAddress) {
+        // 向redis删除服务器连接数
+        redisTemplate.opsForZSet().incrementScore(RedisKey.SERVER_ADDRESS_KEY, serverAddress, -1d);
+    }
+
 
 }

@@ -38,6 +38,18 @@ public class WsServerChannelInit extends ChannelInitializer<SocketChannel> {
     private WsServerMessageHandler wsServerMessageHandler;
 
     /**
+     * 关闭处理器
+     */
+    @Autowired
+    private WsServerCloseHandler wsServerCloseHandler;
+
+    /**
+     * 心跳处理器
+     */
+    @Autowired
+    private WsServerHeartBeatHandler wsServerHeartBeatHandler;
+
+    /**
      * 添加通道
      */
     @Override
@@ -50,7 +62,9 @@ public class WsServerChannelInit extends ChannelInitializer<SocketChannel> {
         // 添加心跳检测处理器 (用于检测和管理网络连接空闲状态的关键组件。开发者可以实现心跳检测、资源清理、超时处理等功能)
         pipeline.addLast(new IdleStateHandler(20, 0, 60));
         // 添加心跳处理器
-
+        pipeline.addLast(wsServerHeartBeatHandler);
+        // 添加自定义关闭处理器
+        pipeline.addLast(wsServerCloseHandler);
         // 添加HTTP服务端编解码器
         pipeline.addLast(new HttpServerCodec());
         // 添加HTTP聚合器(指定最大聚合字节数)
